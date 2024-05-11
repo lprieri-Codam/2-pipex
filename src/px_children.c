@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   px_children_bonus.c                                :+:    :+:            */
+/*   px_children.c                                      :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: lprieri <lprieri@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/03/28 14:58:18 by lprieri       #+#    #+#                 */
-/*   Updated: 2024/04/16 14:34:08 by lprieri       ########   odam.nl         */
+/*   Updated: 2024/04/16 14:40:55 by lprieri       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex_bonus.h"
+#include "../pipex.h"
 
 /* ---------- PROTOTYPES ---------- */
 
@@ -72,9 +72,7 @@ static void	px_run_child(t_info *info, int i, char **envp)
 		px_open_outfile(info);
 		px_redirect_io(info, info->outfilefd, STDOUT_FILENO);
 	}
-	if (i == 0 && info->hdoc)
-		px_hdoc_in(info);
-	else if (i == 0 && !info->hdoc)
+	if (i == 0)
 	{
 		px_open_infile(info);
 		px_redirect_io(info, info->infilefd, STDIN_FILENO);
@@ -127,6 +125,5 @@ static void	px_do_parent_duties(t_info *info, int current_child)
 			px_exit_error(info, "Close failure pipe\n", 1);
 		info->read_end = info->pipefd[READ_END];
 	}
-	if ((info->hdoc && current_child > 0) || !info->hdoc)
-		info->cmds = info->cmds->next;
+	info->cmds = info->cmds->next;
 }

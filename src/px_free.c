@@ -6,7 +6,7 @@
 /*   By: lprieri <lprieri@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/03/13 13:48:55 by lprieri       #+#    #+#                 */
-/*   Updated: 2024/04/11 15:33:45 by lprieri       ########   odam.nl         */
+/*   Updated: 2024/04/16 13:43:00 by lprieri       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,10 +60,9 @@ char	*px_free_cmds(t_cmds **cmds)
 	if ((*cmds) == NULL)
 		return (NULL);
 	px_free_cmds(&(*cmds)->next);
-	free((*cmds)->cmd_name);
+	px_free((void **) &(*cmds)->cmd_name);
 	px_free_2d_arr(&(*cmds)->cmd_vector);
-	free(*cmds);
-	*cmds = NULL;
+	px_free((void **) cmds);
 	return (NULL);
 }
 
@@ -77,6 +76,6 @@ char	*px_free_info(t_info **info)
 	if (!(*info))
 		return (NULL);
 	px_free_2d_arr(&(*info)->paths);
-	px_free_cmds(&(*info)->cmds);
+	px_free_cmds(&(*info)->cmds_ptr);
 	return (px_free((void **) info));
 }

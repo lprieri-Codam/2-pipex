@@ -6,7 +6,7 @@
 /*   By: lprieri <lprieri@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/03/13 15:30:12 by lprieri       #+#    #+#                 */
-/*   Updated: 2024/04/11 15:32:43 by lprieri       ########   odam.nl         */
+/*   Updated: 2024/04/16 14:41:15 by lprieri       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,11 @@
 
 t_cmds			*px_cmds_new(t_info *info, char *fullcmd);
 char			**get_cmd_vector(t_info *info, char *fullcmd);
-int				px_cmds_init(t_info *info, int argc, char *argv[]);
+int				px_cmds_init(t_info *info, char *argv[]);
 static t_cmds	*px_cmds_list_create(t_info *info,
-					int argc, char *argv[], int i);
-void			px_cmds_print(t_cmds *cmds);
+					char *argv[], int cmd_i, int argv_pos);
+void			px_check_command(t_info **info, char *cmd_pathname);
+// void	px_cmds_print(t_cmds *cmds);
 
 /* ---------- FUNCTIONS ---------- */
 
@@ -30,7 +31,7 @@ t_cmds	*px_cmds_new(t_info *info, char *fullcmd)
 {
 	t_cmds	*new;
 
-	new = malloc (sizeof(t_cmds));
+	new = (t_cmds *) malloc(sizeof(t_cmds));
 	if (!new)
 		return (NULL);
 	new->cmd_name = ft_substr(fullcmd, 0, (ft_strchr(fullcmd, ' ') - fullcmd));
@@ -39,6 +40,8 @@ t_cmds	*px_cmds_new(t_info *info, char *fullcmd)
 		new->cmd_vector = get_cmd_vector(info, fullcmd);
 		if (new->cmd_vector)
 			new->pathname = new->cmd_vector[0];
+		else
+			new->pathname = NULL;
 	}
 	else
 	{
@@ -49,9 +52,11 @@ t_cmds	*px_cmds_new(t_info *info, char *fullcmd)
 	return (new);
 }
 
-/*	GET_CMD_VECTOR
+/*	GET COMMAND VECTOR
 *	Takes a full command as a parameter (meaning the command name and its flags).
-*	Returns a cmd vector that is needed for execve command.
+*	Returns an array in which the first element is the command's pathname,
+*	and the rest of the elements are its flags.
+*	This cmd_vector is needed for execve.
 */
 char	**get_cmd_vector(t_info *info, char *fullcmd)
 {
@@ -72,12 +77,14 @@ char	**get_cmd_vector(t_info *info, char *fullcmd)
 /*	COMMANDS INIT
 *	It initializes the commands structure/linked list.
 */
-int	px_cmds_init(t_info *info, int argc, char *argv[])
+int	px_cmds_init(t_info *info, char *argv[])
 {
 	int		i;
+	int		j;
 
 	i = 2;
-	info->cmds = px_cmds_list_create(info, argc, argv, i);
+	j = 0;
+	info->cmds = px_cmds_list_create(info, argv, j, i);
 	return (1);
 }
 
@@ -88,18 +95,18 @@ int	px_cmds_init(t_info *info, int argc, char *argv[])
 *	It creates new cmds nodes and appends them to the cmds linked list.
 */
 static t_cmds	*px_cmds_list_create(t_info *info,
-					int argc, char *argv[], int i)
+					char *argv[], int cmd_i, int argv_pos)
 {
 	t_cmds	*cmds[3];
 
 	cmds[0] = NULL;
 	cmds[1] = NULL;
 	cmds[2] = NULL;
-	while (i <= argc - 2 && argv[i])
+	while (cmd_i < info->cmds_nbr && argv[argv_pos])
 	{
-		cmds[1] = px_cmds_new(info, argv[i]);
-		if (cmds[0] == NULL)
-			return (px_free_cmds(&cmds[0]), NULL);
+		cmds[1] = px_cmds_new(info, argv[argv_pos]);
+		if (cmds[1] == NULL)
+			return (px_free_cmds(&info->cmds), NULL);
 		if (cmds[0] == NULL)
 		{
 			cmds[0] = cmds[1];
@@ -110,21 +117,35 @@ static t_cmds	*px_cmds_list_create(t_info *info,
 			cmds[2]->next = cmds[1];
 			cmds[2] = cmds[2]->next;
 		}
-		i++;
+		argv_pos++;
+		cmd_i++;
 	}
 	return (cmds[0]);
+}
+
+/*	CHECK COMMAND
+*	It checks whether a command's path exists,
+*	and it checks whether it is possible to execute it.
+*	It exits the process on failure with exit code: 127.
+*/
+void	px_check_command(t_info **info, char *cmd_pathname)
+{
+	if (!cmd_pathname || !cmd_pathname[0])
+		px_exit_msg(*info, "Command not found\n", 127);
+	if (access(cmd_pathname, X_OK) == -1)
+		px_exit_msg(*info, "Command not found\n", 127);
 }
 
 /*	PRINT COMMANDS 
 *	Prints each element of the commands structure.
 *	It also iterates through each command in the linked list.
 */
-void	px_cmds_print(t_cmds *cmds)
-{
-	ft_printf("CMD Name: %s\n", cmds->cmd_name);
-	ft_printf("CMD Pathname: %s\n", cmds->pathname);
-	ft_printf("CMD Vector: \n");
-	px_print_arr(cmds->cmd_vector);
-	if (cmds->next != NULL)
-		px_cmds_print(cmds->next);
-}
+// void	px_cmds_print(t_cmds *cmds)
+// {
+// 	ft_printf("CMD Name: %s\n", cmds->cmd_name);
+// 	ft_printf("CMD Pathname: %s\n", cmds->pathname);
+// 	ft_printf("CMD Vector: \n");
+// 	px_print_arr(cmds->cmd_vector);
+// 	if (cmds->next != NULL)
+// 		px_cmds_print(cmds->next);
+// }

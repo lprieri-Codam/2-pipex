@@ -6,7 +6,7 @@
 /*   By: lprieri <lprieri@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/03/13 13:12:45 by lprieri       #+#    #+#                 */
-/*   Updated: 2024/04/11 15:29:28 by lprieri       ########   odam.nl         */
+/*   Updated: 2024/04/16 13:43:10 by lprieri       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ char	*get_pathname(t_info *info, char *cmdname);
 
 /* ---------- FUNCTIONS ---------- */
 
-/*	GET ENVIRONMENT POINTER PATHS
+/*	GET ENVP PATHS
 *	Sets an array with all the possible paths, each path ending with the char '/'
 *	Returns 1 on success and -1 on failure.
 */
@@ -53,8 +53,8 @@ int	get_envp_paths(t_info *info, char **envp)
 }
 
 /*	GET PATHNAME
-*	The function takes a parameter the command name, (the name of the binary).
-*	Compares each path until it finds the first path containing the cmd binary.
+*	The function takes a parameter the command name (the name of the binary file)
+*	Compares each path until it finds the first path that has the command binary.
 *	On success it returns the full path, on failure it returns NULL.
 */
 char	*get_pathname(t_info *info, char *cmdname)
@@ -65,8 +65,6 @@ char	*get_pathname(t_info *info, char *cmdname)
 	if (!info->paths || !info->paths[0] || !cmdname)
 		return (NULL);
 	i = 0;
-	if (access(cmdname, X_OK) == 0)
-		return (ft_strdup(cmdname));
 	while (info->paths && info->paths[i])
 	{
 		pathname = ft_strjoin(info->paths[i], cmdname);
@@ -77,5 +75,7 @@ char	*get_pathname(t_info *info, char *cmdname)
 		px_free((void **) &pathname);
 		i++;
 	}
+	if (access(cmdname, X_OK) == 0)
+		return (ft_strdup(cmdname));
 	return (NULL);
 }

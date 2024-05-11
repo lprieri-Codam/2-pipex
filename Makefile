@@ -3,12 +3,12 @@ CC = cc
 FLAGS = -Wall -Wextra -Werror -g# -fsanitize=address
 RM = rm -f
 SRC = src/pipex.c \
+	src/px_children.c \
 	src/px_cmds.c \
 	src/px_errors.c \
-	src/px_first_child.c \
 	src/px_free.c \
 	src/px_info.c \
-	src/px_last_child.c \
+	src/px_open_utils.c \
 	src/px_paths.c \
 	src/px_utils.c \
 
@@ -43,7 +43,7 @@ re: fclean all
 
 bonus: $(LIBFT) $(B_OBJ)
 	@printf "Compiling\n"
-	@$(CC) $(FLAGS) $(B_OBJ) -L $(LIBFT_DIR) -lft -o $(NAME) #The -l flag prepends "lib"- to the library, so technically you look for "ft"
+	@$(CC) $(FLAGS) $(B_OBJ) -L $(LIBFT_DIR) -lft -o $(NAME)
 	@printf "Done\n"
 
 $(OBJ): $(SRC) pipex.h Makefile
@@ -58,12 +58,10 @@ $(B_OBJ): $(B_SRC) pipex_bonus.h Makefile
 
 $(NAME): $(LIBFT) $(OBJ)
 	@printf "Compiling\n"
-	@$(CC) $(FLAGS) $(OBJ) -L $(LIBFT_DIR) -lft -o $(NAME) #The -l flag prepends "lib"- to the library, so technically you look for "ft"
+	@$(CC) $(FLAGS) $(OBJ) -L $(LIBFT_DIR) -lft -o $(NAME)
 	@printf "Done\n"
 
 $(LIBFT):
 	@$(MAKE) -C $(LIBFT_DIR)
 
 .PHONY: libft all re clean fclean
-
-# Supermaket idea

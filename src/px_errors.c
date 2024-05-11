@@ -6,7 +6,7 @@
 /*   By: lprieri <lprieri@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/03/18 14:35:37 by lprieri       #+#    #+#                 */
-/*   Updated: 2024/04/11 15:33:22 by lprieri       ########   odam.nl         */
+/*   Updated: 2024/04/16 13:42:58 by lprieri       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 void	px_exit(t_info *info, int rvalue);
 void	px_exit_msg(t_info *info, char *msg, int rvalue);
 void	px_exit_error(t_info *info, char *msg, int rvalue);
+void	px_exit_status(t_info *info, int rvalue);
 int		px_status(t_info *info, int status);
 
 /* ---------- FUNCTIONS ---------- */
@@ -52,6 +53,16 @@ void	px_exit_error(t_info *info, char *msg, int rvalue)
 	if (info != NULL)
 		px_free_info(&info);
 	perror(msg);
+	exit(rvalue);
+}
+
+/*	EXIT STATUS
+*	Same functionality as px_error.
+*/
+void	px_exit_status(t_info *info, int rvalue)
+{
+	if (info != NULL)
+		px_free_info(&info);
 	exit(rvalue);
 }
 
